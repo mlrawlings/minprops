@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "test-nomin":"mocha test/src/**/test/*.js test/src/**/test.js"
+    "test-nomin": "mocha test/src/**/test/*.js test/src/**/test.js"
   },
   "author": "Michael Rawlings <ml.rawlings@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
-    "lasso-package-root": "^1.0.0"
+    "lasso-package-root": "^1.0.0",
+    "through2": "^2.0.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
