@@ -19,9 +19,9 @@ function replaceProps(source, context) {
 }
 
 function getPackageContext(package) {
-    if(contexts[package.__filename]) return contexts[package.__filename];
+    if(contexts[package.name]) return contexts[package.name];
 
-    return contexts[package.__filename] = {
+    return contexts[package.name] = {
         currentIndex: 0,
         props: {},
         exclude: indexArray(package.minprops && package.minprops.exclude),
