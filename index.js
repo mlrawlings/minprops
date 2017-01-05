@@ -1,15 +1,70 @@
+'use strict';
+
+var fs = require('fs');
 var path = require('path');
-var getRootPackage = require('lasso-package-root').getRootPackage;
+var minpropsPackagesCache = {};
+var lassoCachingFS = require('lasso-caching-fs');
 var escapeStringRegexp = require('escape-string-regexp');
 var chars = getChars();
 var contexts = {};
+var realpathCache = {};
 
 module.exports = minprops;
 
 function minprops(source, filename) {
-    var package = getRootPackage(path.dirname(filename));
-    var context = getPackageContext(package);
+    var minpropsPkg = getMinpropsPackage(path.dirname(filename));
+    if (!minpropsPkg) {
+        return source;
+    }
+
+    var context = getPackageContext(minpropsPkg);
     return replaceProps(source, context);
+}
+
+function realpathSyncCached(filePath) {
+    var realPath = realpathCache[filePath];
+    if (realPath === undefined) {
+        try {
+            realPath = fs.realpathSync(filePath);
+        } catch(e) {
+            realPath = filePath;
+        }
+    }
+
+    realpathCache[filePath] = realPath;
+
+    return realPath;
+}
+
+function getMinpropsPackage(dirname) {
+    var minpropsPkg = minpropsPackagesCache[dirname];
+    if (minpropsPkg) {
+        return minpropsPkg;
+    }
+
+    var currentDir = dirname;
+    while (true) {
+        var packagePath = path.join(currentDir, 'package.json');
+        var pkg = lassoCachingFS.readPackageSync(packagePath);
+        if (pkg) {
+            if (pkg.minprops) {
+                minpropsPkg = pkg;
+                break;
+            } else if (pkg.name) {
+                break;
+            }
+        }
+
+        var parentDir = path.dirname(currentDir);
+        if (!parentDir || parentDir === currentDir) {
+            break;
+        }
+        currentDir = parentDir;
+    }
+
+    minpropsPackagesCache[dirname] = minpropsPkg || null;
+
+    return minpropsPkg;
 }
 
 function replaceProps(source, context) {
@@ -18,24 +73,30 @@ function replaceProps(source, context) {
     });
 }
 
-function getPackageContext(package) {
-    if(contexts[package.name]) return contexts[package.name];
+function getPackageContext(minpropsPackage) {
+    var key = realpathSyncCached(minpropsPackage.__dirname);
+    var options = minpropsPackage.minprops;
+    var context = contexts[key];
+    if (!context) {
+        context = contexts[key] = {
+            currentIndex: 0,
+            props: {},
+            exclude: indexArray(options.exclude),
+            match: createRegex(options.match),
+            prefix: options.prefix || ''
+        };
+    }
 
-    return contexts[package.name] = {
-        currentIndex: 0,
-        props: {},
-        exclude: indexArray(package.minprops && package.minprops.exclude),
-        match: createRegex(package.minprops && package.minprops.match),
-        prefix: package.minprops && package.minprops.prefix || '',
-    };
+    return context;
 }
 
 function indexArray(array) {
     var index = {};
-
-    array && array.forEach(item => {
-        index[item] = true;
-    });
+    if (array) {
+        array.forEach(item => {
+            index[item] = true;
+        });
+    }
 
     return index;
 }
@@ -46,15 +107,17 @@ function createRegex(prefix) {
 }
 
 function getShortProp(name, context) {
-    if(context.props[name]) return context.props[name];
+    var shortProp = context.props[name];
 
-    var shortProp;
+    if (!shortProp) {
+        do {
+            shortProp = context.prefix + calcShortProp(context.currentIndex++);
+        } while(context.exclude[shortProp]);
 
-    do {
-        shortProp = context.prefix + calcShortProp(context.currentIndex++);
-    } while(context.exclude[shortProp]);
+        context.props[name] = shortProp;
+    }
 
-    return context.props[name] = shortProp;
+    return shortProp;
 }
 
 function calcShortProp(index) {
@@ -73,11 +136,11 @@ function getChars() {
     var upperA = 'A'.charCodeAt(0);
     var upperZ = 'Z'.charCodeAt(0);
 
-    for(var i = lowerA; i <= lowerZ; i++) {
+    for(let i = lowerA; i <= lowerZ; i++) {
         chars.push(String.fromCharCode(i));
     }
 
-    for(var i = upperA; i <= upperZ; i++) {
+    for(let i = upperA; i <= upperZ; i++) {
         chars.push(String.fromCharCode(i));
     }
 
