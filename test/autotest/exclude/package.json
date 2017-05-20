@@ -1,5 +1,5 @@
 {
     "minprops": {
-        "exclude": ["_"]
+        "exclude": ["__"]
     }
 }

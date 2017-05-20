@@ -2,12 +2,12 @@
 
 module.exports = class Adder {
     constructor() {
-        this._ = 0;
+        this.__ = 0;
     }
     add(num) {
-        this._ += num;
+        this.__ += num;
     }
     getSum() {
-        return this._;
+        return this.__;
     }
-}
+};

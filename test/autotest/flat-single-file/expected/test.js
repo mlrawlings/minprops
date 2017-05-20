@@ -14,6 +14,6 @@ describe('adder', () => {
         adder.add(1);
         adder.add(2);
         adder.add(3);
-        expect(adder._).to.equal(6);
+        expect(adder.__).to.equal(6);
     });
 });

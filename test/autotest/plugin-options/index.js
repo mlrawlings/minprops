@@ -4,12 +4,12 @@ var util = require('./util');
 
 module.exports = class Adder {
     constructor() {
-        this.__ = 0;
+        this.$__sum = 0;
     }
     add(num) {
-        this.__ = util.__(this.__, num);
+        this.$__sum = util.$__sum(this.$__sum, num);
     }
-    a_() {
-        return this.__;
+    $__getSum() {
+        return this.$__sum;
     }
 };

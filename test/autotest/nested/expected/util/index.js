@@ -1,3 +1,3 @@
-exports._ = function(a, b) {
-    return a + b;    
+exports.__ = function (a, b) {
+    return a + b;
 };

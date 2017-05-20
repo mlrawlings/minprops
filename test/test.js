@@ -1,11 +1,12 @@
-var fs = require('fs-extra');
-var walk = require('fs-walker');
-var path = require('path');
-var minprops = require('../');
-var expect = require('chai').expect;
-var autotest = require('./util/autotest');
+const babel = require("babel-core");
+const fs = require('fs-extra');
+const walk = require('fs-walker');
+const path = require('path');
+const plugin = require('../src/index');
+const expect = require('chai').expect;
+const autotest = require('./util/autotest');
 
-var generatedDir = path.join(__dirname, 'min');
+const generatedDir = path.join(__dirname, 'min');
 try {
     fs.removeSync(generatedDir);
 } catch(e) {}
@@ -31,8 +32,12 @@ describe('minprops', () => {
 
                 if (/\.js$/.test(basename) && !/expected/.test(basename)) {
                     var source = fs.readFileSync(filename, 'utf-8');
-                    var minified = minprops(source, filename);
-                    var savedBytes = source.length-minified.length;
+                    var minified = babel.transform(source, {
+                        plugins: [plugin],
+                        filename: filename
+                    }).code;
+
+                    var savedBytes = source.length - minified.length;
                     totalSavedBytes += savedBytes;
 
                     fs.writeFileSync(filename, minified);

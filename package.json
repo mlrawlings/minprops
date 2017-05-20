@@ -1,23 +1,28 @@
 {
-  "name": "minprops",
-  "version": "1.0.0",
+  "name": "babel-plugin-minprops",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha test/",
     "test-nomin": "mocha test/src/**/test/*.js test/src/**/test.js"
   },
   "author": "Michael Rawlings <ml.rawlings@gmail.com>",
+  "maintainers": [
+    "Michael Rawlings <ml.rawlings@gmail.com>",
+    "Patrick Steele-Idem <pnidem@gmail.com>"
+  ],
   "license": "ISC",
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
-    "lasso-caching-fs": "^1.0.1",
-    "through2": "^2.0.3"
+    "lasso-caching-fs": "^1.0.1"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
     "chai": "^3.5.0",
     "fs-extra": "^0.30.0",
     "fs-walker": "^1.0.0",
+    "lasso-package-root": "^1.0.1",
     "mocha": "^3.2.0"
   }
 }

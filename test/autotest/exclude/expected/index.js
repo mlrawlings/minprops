@@ -4,7 +4,7 @@ module.exports = class Adder {
     constructor() {
         this._ = 0;
     }
-    a(num) {
+    a_(num) {
         this._ += num;
     }
 };
