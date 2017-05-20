@@ -69,7 +69,9 @@ function getMinifier(state) {
     return cache[cacheKey] || (cache[cacheKey] = new Minifier(options));
 }
 
-function minpropsBabelPlugin({ types: t }) {
+function minpropsBabelPlugin(babel) {
+    var t = babel.types;
+
     return {
         name: "minprops",
         visitor: {
