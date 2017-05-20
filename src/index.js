@@ -2,7 +2,6 @@
 const path = require('path');
 const minpropsPackagesCache = {};
 const lassoCachingFS = require('lasso-caching-fs');
-const lassoPackageRoot = require('lasso-package-root');
 
 const Minifier = require('./Minifier');
 const cache = {};
